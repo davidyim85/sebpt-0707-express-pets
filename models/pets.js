@@ -14,6 +14,10 @@ const PetSchema = mongoose.Schema({
         required: true,
         min: 0,
     },
+    author: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'user'
+    }
 });
 
 // create a variable that creates a models from the schema variable 'PetSchema'. 

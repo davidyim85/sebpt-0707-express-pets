@@ -1,15 +1,41 @@
 const Pet = require('../models/pets.js');
 const express = require('express');
+const jwt = require('jsonwebtoken');
 
 //declare a variable that says these are routes
 const router = express.Router();
 
+//Middleware code
+//create middleware that only exists here that will verify the token's validity
+function verifyToken(req, res, next) {
+    try {
+        const token = req.headers.authorization.split(' ')[1];
+        //verify using 'supersecret
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        // Assign decoded payload to req.user
+        req.user = decoded;
+
+        // Call next() to invoke the next middleware function
+        next();
+    } catch (error) {
+        console.log(error)
+        res.status(401).json({ error: 'invalid auth token' })
+    }
+}
+
+//lets use the middleware
+router.use(verifyToken); //before each route is called have middleware be used
+//end of middleware code
 
 //Write the controllers routes code here
 
 //route to add pets data to the db
 router.post('/', async (req, res) => {
     try {
+        //associate the user to the created pet
+         req.body.author = req.user._id; // is the reference for user
+
         const createdPets = await Pet.create(req.body);
         res.status(201).json(createdPets);
     } catch (err) {
@@ -20,7 +46,7 @@ router.post('/', async (req, res) => {
 //route to fetch all pets data from the db
 router.get('/', async (req, res) => {
     try {
-        const foundPets = await Pet.find();
+        const foundPets = await Pet.find({ author: req.user._id }); //add: { author: req.user._id }
         res.status(200).json(foundPets);
     } catch (err) {
         res.status(500).json({ err: err.message });

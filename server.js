@@ -4,6 +4,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const logger = require('morgan');
 const petRouter = require('./controllers/pets.js'); // Import the pets controller file
+const userRouter = require('./controllers/user'); //import our 'user' controller routes
 const cors = require('cors'); //cors 
 //end our import code
 
@@ -29,6 +30,7 @@ app.use(logger('dev')); //this is the morgan code that logs our requests to the 
 
 //routes codes go here
 app.use('/pets', petRouter); // Add the petRouter to the `/pets` route. This whatever route we define in the pets controller path of /pets in the ENTIRE route
+app.use('/users', userRouter);  //new
 //end of routes code
 
 
